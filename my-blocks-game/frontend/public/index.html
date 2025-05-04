@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ブロックバトルゲーム</title>
+  <style>
+    #playerHP, #enemyHP {
+      margin: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- HPバー -->
+  <div id="playerHP">Player: 100</div>
+  <div id="enemyHP">Enemy: 50</div>
+
+  <!-- ゲーム画面 -->
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <!-- ブロックエディタ -->
+  <div id="blocklyDiv" style="height: 200px; width: 800px;"></div>
+  <xml id="toolbox" style="display: none"></xml>
+
+  <button id="runButton">実行</button>
+</body>
+</html>

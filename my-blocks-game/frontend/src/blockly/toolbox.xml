@@ -1,0 +1,10 @@
+<xml>
+
+    <block type="attack"></block>
+    <block type="heal"></block>
+    <block type="wait_seconds"></block>
+    <block type="cast_magic"></block>
+    <block type="wave_left_hand"></block>
+    <block type="wave_right_hand"></block>
+
+</xml>

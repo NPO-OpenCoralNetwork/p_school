@@ -280,26 +280,6 @@ cd ../wasm-game-core
 wasm-pack build --target web
 ```
 
-### 開発中のトラブルシューティング
-
-1. **依存関係のエラー**
-   - node_modulesを削除して再インストールしてみてください
-   ```bash
-   rm -rf node_modules
-   npm install
-   ```
-
-2. **Blocklyメディアファイルが見つからない場合**
-   - 以下のコマンドで手動でコピーしてください
-   ```bash
-   cp -r node_modules/scratch-blocks/media ./public/
-   ```
-
-3. **webpack関連のエラー**
-   - webpack設定は既にプロジェクトに含まれており、通常は変更する必要はありません
-   - NPMスクリプトを使うだけで自動的に正しいwebpack設定が使用されます
-
----
 
 ## 技術スタック
 

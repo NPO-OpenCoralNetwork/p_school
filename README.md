@@ -155,16 +155,149 @@ my-blocks-game/
 
 ## 開発環境のセットアップ
 
+### 前提条件
+
+このプロジェクトの開発には以下のツールが必要です：
+
+- Node.js (v16以上) と npm (v7以上)
+- Git
+- (オプション) Rust と Cargo
+- (オプション) wasm-pack
+
+### OS別インストール方法
+
+#### Windows
+
+1. **Node.js と npm**
+   ```
+   # 公式サイトからインストーラーをダウンロード
+   https://nodejs.org/
+
+   # または chocolatey を使用（管理者権限のPowerShellで）
+   choco install nodejs
+   ```
+
+2. **Git**
+   ```
+   # 公式サイトからインストーラーをダウンロード
+   https://git-scm.com/download/win
+
+   # または chocolatey を使用
+   choco install git
+   ```
+
+3. **Rust と Cargo** (オプション)
+   ```
+   # 公式インストーラーを使用
+   https://www.rust-lang.org/tools/install
+
+   # または PowerShell から直接インストール
+   curl -sSf https://sh.rustup.rs | sh
+   ```
+
+4. **wasm-pack** (オプション)
+   ```
+   # cargoでインストール（Rustをインストール後）
+   cargo install wasm-pack
+   ```
+
+#### macOS
+
+1. **Node.js と npm**
+   ```
+   # HomeBrew を使用
+   brew install node
+
+   # または公式サイトからインストーラーをダウンロード
+   https://nodejs.org/
+   ```
+
+2. **Git**
+   ```
+   # HomeBrew を使用
+   brew install git
+
+   # または Xcode Command Line Tools をインストール
+   xcode-select --install
+   ```
+
+3. **Rust と Cargo** (オプション)
+   ```
+   # rustup をインストール
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
+4. **wasm-pack** (オプション)
+   ```
+   # cargoでインストール（Rustをインストール後）
+   cargo install wasm-pack
+   ```
+
+#### Linux (Ubuntu/Debian)
+
+1. **Node.js と npm**
+   ```
+   # apt を使用
+   curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+   sudo apt install -y nodejs
+
+   # または nvm を使用
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+   nvm install node
+   ```
+
+2. **Git**
+   ```
+   sudo apt install git
+   ```
+
+3. **Rust と Cargo** (オプション)
+   ```
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
+4. **wasm-pack** (オプション)
+   ```
+   cargo install wasm-pack
+   ```
+
+### プロジェクトのセットアップ
+
+リポジトリをクローンした後、以下の手順で開発環境をセットアップします：
+
 ```bash
-# フロントエンド
+# リポジトリをクローン
+git clone https://github.com/yourusername/my-blocks-game.git
+cd my-blocks-game
+
+# フロントエンド依存関係のインストール
 cd frontend
 npm install
 npm start
 
 # WASMコンポーネント（必要な場合）
-cd wasm-game-core
+cd ../wasm-game-core
 wasm-pack build --target web
 ```
+
+### 開発中のトラブルシューティング
+
+1. **依存関係のエラー**
+   - node_modulesを削除して再インストールしてみてください
+   ```bash
+   rm -rf node_modules
+   npm install
+   ```
+
+2. **Blocklyメディアファイルが見つからない場合**
+   - 以下のコマンドで手動でコピーしてください
+   ```bash
+   cp -r node_modules/scratch-blocks/media ./public/
+   ```
+
+3. **webpack関連のエラー**
+   - webpack設定は既にプロジェクトに含まれており、通常は変更する必要はありません
+   - NPMスクリプトを使うだけで自動的に正しいwebpack設定が使用されます
 
 ---
 

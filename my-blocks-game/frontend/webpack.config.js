@@ -3,17 +3,20 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  mode: "development", // 開発中は development モードを使用
+  mode: "development",
   entry: "./src/index.js",
   output: {
     filename: "[name].[contenthash].js",
     path: path.resolve(__dirname, "dist"),
-    clean: true // 古いファイルの自動クリーンアップ
+    clean: true
+  },
+  experiments: {
+    asyncWebAssembly: true,
+    syncWebAssembly: true,
   },
   optimization: {
     splitChunks: {
       chunks: 'all',
-      // サードパーティライブラリを別バンドルに
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
@@ -24,7 +27,14 @@ module.exports = {
     }
   },
   devServer: {
-    static: path.join(__dirname, "dist"),
+    static: [
+      path.join(__dirname, "dist"),
+      // 開発サーバーからWASMファイルにアクセスできるようにする
+      { 
+        directory: path.resolve(__dirname, '../wasm-game-core/pkg'),
+        publicPath: '/wasm-game-core/pkg'
+      }
+    ],
     port: 8080,
     hot: true
   },
@@ -46,6 +56,10 @@ module.exports = {
       {
         test: /\.(mp3|wav|ogg)$/,
         type: "asset/resource"
+      },
+      {
+        test: /\.wasm$/,
+        type: "asset/resource"
       }
     ]
   },
@@ -57,7 +71,16 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "node_modules/scratch-blocks/media", to: "media" },
+        // WAMSビルド後の成果物をdistにコピー
+        { 
+          from: path.resolve(__dirname, "../wasm-game-core/pkg"), 
+          to: "wasm-game-core/pkg",
+          noErrorOnMissing: true
+        },
       ],
     }),
-  ]
+  ],
+  resolve: {
+    extensions: ['.js', '.wasm']
+  }
 };

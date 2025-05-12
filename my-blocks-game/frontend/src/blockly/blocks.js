@@ -1,7 +1,4 @@
-
-
 import Blockly from 'scratch-blocks';
-
 
 Blockly.Blocks['attack'] = {
   init: function() {
@@ -13,7 +10,6 @@ Blockly.Blocks['attack'] = {
     });
   }
 };
-
 
 Blockly.Blocks['cast_spell'] = {
   init: function() {
@@ -37,7 +33,6 @@ Blockly.Blocks['cast_spell'] = {
   }
 };
 
-
 Blockly.Blocks['heal'] = {
   init: function() {
     this.jsonInit({
@@ -55,7 +50,6 @@ Blockly.Blocks['heal'] = {
     });
   }
 };
-
 
 Blockly.Blocks['wait_seconds'] = {
   init: function() {
@@ -125,6 +119,39 @@ Blockly.Blocks['cast_magic'] = {
       "category": "バトルコマンド",
       "colour": 230,
       "extensions": ["colours_operators", "shape_hat"]
+    });
+  }
+};
+
+// 回復魔法ブロック（ステージ2用）
+Blockly.Blocks['cast_healing'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "回復魔法を使う",
+      "category": "バトルコマンド",
+      "colour": 110, // 緑色系
+      "extensions": ["colours_operators", "shape_statement"],
+      "tooltip": "HPを回復します。ステージ2で使用できます。"
+    });
+  }
+};
+
+// 回復魔法詠唱ブロック（ヒーリングバリエーション - ステージ2用）
+Blockly.Blocks['cast_healing_magic'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "回復の魔法を詠唱する",
+      "message1": "%1",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "INCANTATION"
+        }
+      ],
+      "category": "バトルコマンド",
+      "colour": 110, // 緑色系
+      "extensions": ["colours_operators", "shape_hat"],
+      "tooltip": "回復の魔法を詠唱します。正しい手順で詠唱すると効果が発動します。"
     });
   }
 };

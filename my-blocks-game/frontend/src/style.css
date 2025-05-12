@@ -1,26 +1,36 @@
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: sans-serif;
-  }
-  #gameCanvas {
-    border: 1px solid #000;
-  }
-  #blocklyDiv {
-    margin-top: 10px;
-  }
-  #logArea {
-    width: 800px;
-    max-height: 150px;
-    overflow-y: auto;
-    margin-top: 10px;
-    background: #f9f9f9;
-    padding: 5px;
-    border: 1px solid #ccc;
-  }
-  button {
-    margin-top: 5px;
-    padding: 5px 10px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+}
+#gameCanvas {
+  border: 1px solid #000;
+  display: block; /* キャンバスを表示状態にする */
+}
+#blocklyDiv {
+  margin-top: 10px;
+  height: 300px !important; /* 高さを固定 */
+  width: 800px !important; /* 幅を固定 */
+  display: block; /* Blocklyエディタを表示状態にする */
+}
+#logArea {
+  width: 800px;
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 10px;
+  background: #f9f9f9;
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+button {
+  margin-top: 5px;
+  padding: 5px 10px;
+}
+#playerHP, #enemyHP {
+  margin: 5px;
+  padding: 2px 5px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  display: inline-block;
+}

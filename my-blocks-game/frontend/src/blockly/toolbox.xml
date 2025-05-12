@@ -1,10 +1,11 @@
 <xml>
-
-    <block type="attack"></block>
-    <block type="heal"></block>
-    <block type="wait_seconds"></block>
-    <block type="cast_magic"></block>
-    <block type="wave_left_hand"></block>
-    <block type="wave_right_hand"></block>
-
+        <block type="attack"></block>
+        <block type="heal"></block>
+        <block type="wait_seconds"></block>
+        <block type="cast_magic"></block>
+        <block type="wave_left_hand"></block>
+        <block type="wave_right_hand"></block>
+        <!-- ステージ2用の回復魔法ブロックを追加 -->
+        <block type="cast_healing"></block>
+        <block type="cast_healing_magic"></block>
 </xml>

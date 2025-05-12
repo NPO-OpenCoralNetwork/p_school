@@ -26,6 +26,17 @@ export class Enemy {
       if (this.scene.player) {
         this.scene.player.hp -= damage;
         this.ui.updateHP(this.scene.player.hp, this.hp);
+        
+        // プレイヤーのHPがゼロ以下になったかチェック
+        if (this.scene.player.hp <= 0) {
+          this.ui.log("プレイヤーは倒れた！敵の勝利！");
+          await delay(1000);
+          // ゲームオーバー状態に移行
+          if (this.scene.gameOver) {
+            this.scene.gameOver(false); // false = プレイヤー敗北
+          }
+          return false;
+        }
       }
       
       await delay(1000);

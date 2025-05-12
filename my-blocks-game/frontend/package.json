@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --open"
+    "start": "webpack serve --open",
+    "build": "webpack --mode production",
+    "build:wasm": "cd \"../wasm-game-core\" && wasm-pack build --target web",
+    "dev": "npm run build:wasm && npm run start"
   },
   "keywords": [],
   "author": "",
@@ -18,9 +21,11 @@
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
+    "@wasm-tool/wasm-pack-plugin": "^1.6.0",
     "babel-loader": "^10.0.0",
     "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.1.2",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.6.3",
     "raw-loader": "^4.0.2",
     "style-loader": "^4.0.0",

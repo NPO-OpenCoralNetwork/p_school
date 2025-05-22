@@ -23,5 +23,33 @@ export const BATTLE_STAGES = [
       enemy: 'poisonmoth',
       stageNumber: 2
     }
+  },  {
+    key: 'Stage3Battle',  // 'BattleScene3'のキー
+    name: 'ステージ3: 魔法の詠唱',
+    difficulty: 'Easy',
+    params: {
+      background: 'volcano',
+      enemy: 'firegoblin',
+      stageNumber: 3
+    }
+  },  {
+    key: 'Stage4Battle',  // 'BattleScene4'のキー
+    name: 'ステージ4: 氷の壁',
+    difficulty: 'Easy',
+    params: {
+      background: 'snow',
+      enemy: 'flamewolf',
+      stageNumber: 4
+    }
+  },
+  {
+    key: 'Stage5Battle',  // 'BattleScene5'のキー
+    name: 'ステージ5: 時間との勝負',
+    difficulty: 'Easy',
+    params: {
+      background: 'clock',
+      enemy: 'timeeater',
+      stageNumber: 5
+    }
   }
 ];

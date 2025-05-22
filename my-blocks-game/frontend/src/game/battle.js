@@ -13,7 +13,8 @@ export class BattleScene extends Phaser.Scene {
     this.settings = {
       background: 'forest',
       enemy: 'goblin',
-      scratchMode: false
+      scratchMode: false,
+      stageNumber: 1
     };
     
     // ゲーム変数の初期化
@@ -38,6 +39,9 @@ export class BattleScene extends Phaser.Scene {
     this.load.image('buttonBg', 'assets/button.png');
     this.load.image('hpBarFrame', 'assets/hp-bar-frame.png'); // HPバーのフレーム画像
     this.load.image('panelBg', 'assets/panel-bg.png'); // パネル背景
+    
+    // エフェクト用アセット
+    this.load.image('particle', 'assets/particle.png'); // パーティクルエフェクト用画像
     
     // 魔法の書の画像をロード
     this.load.image('spellbook', 'assets/spellbook.png');
@@ -358,7 +362,7 @@ export class BattleScene extends Phaser.Scene {
     });
   }
   
-  // 魔法詠唱のポップアップを表示
+  // 魔法詠唱のポップアップを表示（Stage1のベース実装）
   showSpellPopup() {
     // すでにポップアップがある場合は削除
     if (this.spellPopup) {
@@ -394,8 +398,8 @@ export class BattleScene extends Phaser.Scene {
     titleBg.fillStyle(0x4a6fff, 0.6);
     titleBg.fillRoundedRect(-180, -155, 360, 50, 10);
     
-    // タイトル
-    const title = this.add.text(0, -130, '魔法詠唱パターン', {
+    // タイトル (基本コマンドのみ表示)
+    const title = this.add.text(0, -130, '基本コマンド', {
       fontFamily: 'Verdana, "メイリオ", sans-serif',
       fontSize: '28px',
       fontStyle: 'bold',
@@ -405,42 +409,28 @@ export class BattleScene extends Phaser.Scene {
       shadow: { offsetX: 2, offsetY: 2, color: '#000', blur: 3, fill: true }
     }).setOrigin(0.5);
     
-    // 魔法アイコン
-    const fireIcon = this.add.graphics();
-    fireIcon.fillStyle(0xff3300, 0.8);
-    fireIcon.fillCircle(-150, -60, 15);
+    // ステージ1のコンテンツを作成
+    // 攻撃アイコン
+    const attackIcon = this.add.graphics();
+    attackIcon.fillStyle(0xff3300, 0.8);
+    attackIcon.fillCircle(-150, -30, 15);
     
-    const iceIcon = this.add.graphics();
-    iceIcon.fillStyle(0x00ffff, 0.8);
-    iceIcon.fillRect(-165, 0, 30, 30);
-    
-    const thunderIcon = this.add.graphics();
-    thunderIcon.lineStyle(3, 0xffff00, 0.8);
-    thunderIcon.lineBetween(-165, 80, -135, 60);
-    thunderIcon.lineBetween(-135, 60, -155, 70);
-    thunderIcon.lineBetween(-155, 70, -135, 90);
-    
-    // 魔法の説明テキスト
-    const fireText = this.add.text(-120, -60, '炎の魔法: 右手→右手→左手', {
+    // 攻撃コマンドの説明
+    const attackText = this.add.text(-120, -30, '「攻撃」: 敵に基本攻撃を行います', {
       fontFamily: 'Verdana, "メイリオ", sans-serif',
       fontSize: '18px',
       fill: '#ff9966',
       shadow: { offsetX: 1, offsetY: 1, color: '#000', blur: 1, fill: true }
     }).setOrigin(0, 0.5);
     
-    const iceText = this.add.text(-120, 0, '氷の魔法: 左手', {
+    // 解説
+    const stageInfo = this.add.text(0, 50, '敵を倒すにはまず攻撃を覚えましょう。\n適切なタイミングでの攻撃が勝利への鍵です！', {
       fontFamily: 'Verdana, "メイリオ", sans-serif',
-      fontSize: '18px',
-      fill: '#99ffff',
-      shadow: { offsetX: 1, offsetY: 1, color: '#000', blur: 1, fill: true }
-    }).setOrigin(0, 0.5);
-    
-    const thunderText = this.add.text(-120, 75, '雷の魔法: 右手→左手→右手→左手', {
-      fontFamily: 'Verdana, "メイリオ", sans-serif',
-      fontSize: '18px',
-      fill: '#ffff99',
-      shadow: { offsetX: 1, offsetY: 1, color: '#000', blur: 1, fill: true }
-    }).setOrigin(0, 0.5);
+      fontSize: '16px',
+      fill: '#ffffff',
+      align: 'center',
+      wordWrap: { width: 380 }
+    }).setOrigin(0.5);
     
     // ボタン背景
     const buttonBg = this.add.graphics();
@@ -457,9 +447,9 @@ export class BattleScene extends Phaser.Scene {
       fill: '#ffffff'
     }).setOrigin(0.5).setInteractive();
     
-    // 全ての要素をコンテナに追加
-    container.add([popupBg, titleBg, title, fireIcon, iceIcon, thunderIcon, 
-                  fireText, iceText, thunderText, buttonBg, closeButton]);
+    // 基本要素をコンテナに追加
+    container.add([popupBg, titleBg, title, buttonBg, closeButton, 
+                  attackIcon, attackText, stageInfo]);
     
     // ポップアップを表示するアニメーション
     this.tweens.add({
@@ -954,7 +944,8 @@ export class BattleScene extends Phaser.Scene {
   }
   
   // バトル中のプレイヤーのHPを回復するメソッド
-  healPlayer(amount) {
+  async healPlayer(amount) {
+    console.log("BattleScene healPlayer called with amount:", amount);
     // 現在のHPを取得し、回復量を加算（最大HPを超えないように）
     const currentHP = this.player.getHP();
     const maxHP = 100; // プレイヤーの最大HP
@@ -971,6 +962,8 @@ export class BattleScene extends Phaser.Scene {
     
     // ログに回復メッセージを追加
     this.addLog(`プレイヤーのHPが ${amount} 回復した！`);
+    
+    return true;
   }
 
   // 回復エフェクトを表示する
@@ -1123,6 +1116,7 @@ export class BattleScene extends Phaser.Scene {
 
   // ブロックエディタを表示
   showBlockEditor() {
+    console.log("Showing block editor and UI elements");
     // ブロックエディタを表示
     const blocklyDiv = document.getElementById('blocklyDiv');
     if (blocklyDiv) {
@@ -1133,12 +1127,13 @@ export class BattleScene extends Phaser.Scene {
     const runButton = document.getElementById('runButton');
     if (runButton) {
       runButton.style.display = 'block';
+      runButton.disabled = false; // 確実にボタンを有効化
     }
     
     // HPバーを表示
     const playerHP = document.getElementById('playerHP');
     const enemyHP = document.getElementById('enemyHP');
     if (playerHP) playerHP.style.display = 'block';
-    if (enemyHP) playerHP.style.display = 'block';
+    if (enemyHP) enemyHP.style.display = 'block'; // 修正: enemyHP.style.displayに変更
   }
 }

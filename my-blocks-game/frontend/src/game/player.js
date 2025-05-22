@@ -25,5 +25,26 @@ export class Player {
       this.ui.log(`回復 ${amount} (HP: ${this.hp})`);
       this.ui.updateHP(this.hp, this.scene.enemy.hp);
     }
+    
+    // 回復魔法用のメソッド（シーンのhealPlayerメソッドがない場合のフォールバック）
+    async healPlayer(amount) {
+      console.log("Player's healPlayer method called with amount:", amount);
+      // シーンに委譲を試みる
+      if (this.scene && typeof this.scene.healPlayer === 'function') {
+        return await this.scene.healPlayer(amount);
+      }
+      // シーンのメソッドがない場合は単に通常の回復を行う
+      return await this.heal(amount);
+    }
+    
+    // HP取得メソッド
+    getHP() {
+      return this.hp;
+    }
+    
+    // HP設定メソッド
+    setHP(value) {
+      this.hp = value;
+    }
   }
   

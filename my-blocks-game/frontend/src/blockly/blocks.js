@@ -69,6 +69,19 @@ Blockly.Blocks['wait_seconds'] = {
   }
 };
 
+// 新しい待機ブロック（数値入力なし、ステージ5用）
+Blockly.Blocks['wait'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "敵の攻撃を待機",
+      "category": "バトルコマンド",
+      "colour": 160,
+      "extensions": ["colours_operators", "shape_statement"],
+      "tooltip": "1秒待機し、敵の攻撃を回避できる可能性があります。特にステージ5で有効です。"
+    });
+  }
+};
+
 // 左手を振るブロック
 Blockly.Blocks['wave_left_hand'] = {
   init: function() {
@@ -152,6 +165,46 @@ Blockly.Blocks['cast_healing_magic'] = {
       "colour": 110, // 緑色系
       "extensions": ["colours_operators", "shape_hat"],
       "tooltip": "回復の魔法を詠唱します。正しい手順で詠唱すると効果が発動します。"
+    });
+  }
+};
+
+// 炎の魔法詠唱ブロック（ステージ3用）
+Blockly.Blocks['cast_fire_magic'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "炎の魔法を詠唱する",
+      "message1": "%1",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "INCANTATION"
+        }
+      ],
+      "category": "バトルコマンド",
+      "colour": 350, // 赤紫色系
+      "extensions": ["colours_operators", "shape_hat"],
+      "tooltip": "炎の魔法を詠唱します。右手→右手→左手の順で詠唱すると効果が発動します。"
+    });
+  }
+};
+
+// 氷の魔法詠唱ブロック（ステージ4用）
+Blockly.Blocks['cast_ice_magic'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "氷の魔法を詠唱する",
+      "message1": "%1",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "INCANTATION"
+        }
+      ],
+      "category": "バトルコマンド",
+      "colour": 210, // 青色系
+      "extensions": ["colours_operators", "shape_hat"],
+      "tooltip": "氷の魔法を詠唱します。左手→左手の順で詠唱すると効果が発動します。"
     });
   }
 };

@@ -12,7 +12,7 @@ pub struct PatternEvaluationResult {
 // 詠唱パターン対応表
 const MAGIC_PATTERNS: &[(&str, &str)] = &[
     ("FIRE", "right,right,left"),
-    ("ICE", "left"),
+    ("ICE", "left,left"), // ステージ4用の氷魔法パターンを更新
     ("THUNDER", "right,left,right,left"),
     ("HEALING", "left,right,left,right,left,right"), // ステージ2用の回復魔法パターン
 ];

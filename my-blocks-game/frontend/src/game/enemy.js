@@ -3,6 +3,7 @@ export class Enemy {
       this.scene = scene;
       this.ui = ui;
       this.hp = 50;
+      this.maxHp = 50; // 最大HP値を追加
       this.sprite = null; // スプライト参照用
     }
   
@@ -41,6 +42,16 @@ export class Enemy {
       
       await delay(1000);
       return true;
+    }
+    
+    // HP取得メソッド
+    getHP() {
+      return this.hp;
+    }
+    
+    // HP設定メソッド
+    setHP(value) {
+      this.hp = value;
     }
 }
 

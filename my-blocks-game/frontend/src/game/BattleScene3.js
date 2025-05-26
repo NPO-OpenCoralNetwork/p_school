@@ -28,10 +28,9 @@ export class BattleScene3 extends BattleScene {
     
     // ステージ3専用のセットアップ
     this.setupStage3();
-    
-    // バトル開始メッセージを更新
-    this.addLog(`ステージ3「魔法の詠唱」が始まりました！炎を操る${this.settings.enemy}と対決します！`);
-
+      // バトル開始メッセージを更新
+    this.addLog(`ステージ3「魔法の詠唱」が始まりました！${this.settings.enemy}と対決します！`);
+    this.addLog('📖 魔法の書を参照して、詠唱パターンを確認しましょう');
   }
 
   setupStage3() {
@@ -71,24 +70,22 @@ export class BattleScene3 extends BattleScene {
         lifespan: { min: 800, max: 1500 },
         quantity: 2,
         tint: [ 0xff0000, 0xff7700, 0xff9900 ] // 赤からオレンジの色合い
-      });
-    } catch (e) {
+      });    } catch (e) {
       console.warn("新しいパーティクルシステムに対応していません。従来の方法でエフェクトを作成します", e);
       
-      // 従来のパーティクル設定方法
-      const emitter = this.add.particles('particle').createEmitter({
-        x: 400,
-        y: 550,
+      // Phaser 3.60 対応のパーティクル設定方法
+      this.fireParticles = this.add.particles(400, 550, {
+        key: 'particle',
         speed: { min: 50, max: 100 },
         angle: { min: 260, max: 280 },
         scale: { start: 0.5, end: 0.1 },
         alpha: { start: 0.8, end: 0 },
         lifespan: { min: 800, max: 1500 },
         quantity: 2,
-        tint: [ 0xff0000, 0xff7700, 0xff9900 ]
+        tint: [ 0xff0000, 0xff7700, 0xff9900 ],
+        emitting: true,
+        frequency: 100
       });
-      
-      this.fireParticles = emitter;
     }
     
     // 地面からの熱気エフェクト

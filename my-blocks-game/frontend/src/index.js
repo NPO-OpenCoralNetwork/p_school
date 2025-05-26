@@ -18,8 +18,7 @@ import { MainMenuScene } from "./game/MainMenuScene";
 // Blockly 初期化
 window.onload = () => {
   console.log("Loading Blockly workspace...");
-  
-  // toolboxの設定
+    // toolboxの設定
   let toolbox;
   try {
     const parser = new DOMParser();
@@ -28,7 +27,20 @@ window.onload = () => {
   } catch (e) {
     console.error("Error parsing toolbox:", e);
   }
-    // Blocklyワークスペースの初期化
+  // Blocklyワークスペースの初期化
+  console.log("Initializing Blockly workspace...");
+  const blocklyDiv = document.getElementById("blocklyDiv");
+  console.log("BlocklyDiv element:", blocklyDiv);
+  
+  // blocklyDivを確実に表示状態にする
+  if (blocklyDiv) {
+    blocklyDiv.style.display = 'block';
+    blocklyDiv.style.visibility = 'visible';
+    blocklyDiv.style.width = '550px';
+    blocklyDiv.style.height = '600px';
+    console.log("BlocklyDiv display style set to:", blocklyDiv.style.display);
+  }
+  
   const workspace = Blockly.inject("blocklyDiv", {
     toolbox: toolbox,
     media: "./media/",
@@ -41,8 +53,7 @@ window.onload = () => {
       startScale: 0.75,
       maxScale: 4,
       minScale: 0.25,
-      scaleSpeed: 1.1
-    }
+      scaleSpeed: 1.1    }
   });
   
   console.log("Workspace created:", workspace);
@@ -57,8 +68,7 @@ window.onload = () => {
       Blockly.svgResize(workspace);
     }, 250);
   });
-  
-  // カテゴリ選択時のスクロール機能を追加
+    // カテゴリ選択時のスクロール機能を追加
   setupCategoryScrolling(workspace);
   
   // Phaser ゲーム起動
@@ -69,10 +79,10 @@ window.onload = () => {
     canvas: document.getElementById('gameCanvas'),
     scene: [MainMenuScene, BattleScene, BattleScene2, BattleScene3, BattleScene4, BattleScene5]  // BattleScene5を追加
   };
-
   // ゲームインスタンスを作成
   const game = new Phaser.Game(config);
-    // コマンド実行関数を共通化
+  
+  // コマンド実行関数を共通化
   const executeCommands = async () => {
     console.log("Run button clicked - executing commands");
     const ast = await getASTFromWorkspace(workspace);
@@ -80,11 +90,14 @@ window.onload = () => {
     // 利用可能なシーンを確認
     const scenes = game.scene.getScenes();
     console.log("Available scenes:", scenes.map(scene => scene.scene.key));
-    
-    // アクティブなシーンを全て取得
+      // アクティブなシーンを全て取得
     const activeScenes = scenes.filter(scene => scene.scene.isActive());
-    console.log("Active scenes:", activeScenes.map(scene => scene.scene.key));    // 現在有効なステージ名の配列（優先度順）
-    const battleSceneKeys = ['Stage5Battle', 'Stage4Battle', 'Stage3Battle', 'Stage2Battle', 'BattleScene'];// アクティブなバトルシーンを探す (Stage3Battle または Stage2Battle または BattleScene)
+    console.log("Active scenes:", activeScenes.map(scene => scene.scene.key));
+    
+    // 現在有効なステージ名の配列（優先度順）
+    const battleSceneKeys = ['Stage5Battle', 'Stage4Battle', 'Stage3Battle', 'Stage2Battle', 'BattleScene'];
+    
+    // アクティブなバトルシーンを探す (Stage3Battle または Stage2Battle または BattleScene)
     // battleSceneKeysの順で優先的に探す
     let battleScene = null;
     for (const key of battleSceneKeys) {
@@ -106,10 +119,10 @@ window.onload = () => {
         scene: battleScene // シーンそのものも渡す
       }, battleScene.ui || new UI());
     } else {
-      console.warn('バトルシーンがアクティブではありません。コマンドは実行できません。');
-    }
+      console.warn('バトルシーンがアクティブではありません。コマンドは実行できません。');    }
   };
-    // 「実行」ボタンにイベントリスナーを追加
+  
+  // 「実行」ボタンにイベントリスナーを追加
   document.getElementById("runButton").addEventListener("click", executeCommands);
   
   // カスタムイベントも購読（BattleScene2からも実行できるように）

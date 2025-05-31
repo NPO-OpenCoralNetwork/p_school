@@ -28,9 +28,9 @@ export class BattleScene4 extends BattleScene {
     
     // ステージ4専用のセットアップ
     this.setupStage4();
-    
-    // バトル開始メッセージを更新
+      // バトル開始メッセージを更新
     this.addLog(`ステージ4「氷の壁」が始まりました！灼熱の${this.settings.enemy}と対決します！`);
+    this.addLog('📖 魔法の書を参照して、詠唱パターンを確認しましょう');
   }
 
   setupStage4() {
@@ -56,41 +56,20 @@ export class BattleScene4 extends BattleScene {
     // 使用可能なブロックを設定（攻撃、回復、魔法詠唱（炎、氷））
     this.setupAvailableBlocks();
   }
-
   createFlameEffect() {
-    try {
-      // 新しいPhaserバージョン用のパーティクル設定
-      this.flameParticles = this.add.particles(0, 0, 'particle', {
-        x: this.enemySprite.x,
-        y: this.enemySprite.y,
-        scale: { start: 0.4, end: 0.1 },
-        speed: { min: 30, max: 60 },
-        angle: { min: 0, max: 360 },
-        alpha: { start: 0.6, end: 0 },
-        lifespan: { min: 600, max: 1200 },
-        quantity: 2,
-        frequency: 120,
-        tint: [ 0xff0000, 0xff6600, 0xff9900 ] // 赤からオレンジの色合い
-      });
-    } catch (e) {
-      console.warn("新しいパーティクルシステムに対応していません。従来の方法でエフェクトを作成します", e);
-      
-      // 従来のパーティクル設定方法
-      const emitter = this.add.particles('particle').createEmitter({
-        x: this.enemySprite.x,
-        y: this.enemySprite.y,
-        speed: { min: 30, max: 60 },
-        angle: { min: 0, max: 360 },
-        scale: { start: 0.4, end: 0.1 },
-        alpha: { start: 0.6, end: 0 },
-        lifespan: { min: 600, max: 1200 },
-        quantity: 2,
-        frequency: 120,
-        tint: [ 0xff0000, 0xff6600, 0xff9900 ]
-      });
-      
-      this.flameParticles = emitter;
-    }
+    // Create a flame effect using Phaser 3.60 particle system
+    this.flameParticles = this.add.particles(this.enemySprite.x, this.enemySprite.y, {
+      key: 'particle',
+      speed: { min: 30, max: 60 },
+      scale: { start: 0.4, end: 0.1 },
+      angle: { min: 0, max: 360 },
+      alpha: { start: 0.6, end: 0 },
+      lifespan: { min: 600, max: 1200 },
+      quantity: 2,
+      frequency: 120,
+      tint: [ 0xff0000, 0xff6600, 0xff9900 ],
+      emitting: true
+    });
   }
 
   setupAvailableBlocks() {

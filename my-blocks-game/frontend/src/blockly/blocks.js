@@ -208,3 +208,165 @@ Blockly.Blocks['cast_ice_magic'] = {
     });
   }
 };
+
+// 解毒薬調合ブロック（ステージ6用）
+Blockly.Blocks['brew_antidote'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "解毒薬を調合する",
+      "category": "薬学",
+      "colour": 65, // 緑色系
+      "extensions": ["colours_operators", "shape_statement"],
+      "tooltip": "毒状態を治療する解毒薬を調合します。毒を受けたらすぐに使いましょう。"
+    });
+  }
+};
+
+// 薬の使用ブロック（ステージ6用）
+Blockly.Blocks['use_potion'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 を使用する",
+      "args0": [
+        {
+          "type": "field_dropdown",
+          "name": "POTION_TYPE",
+          "options": [
+            ["解毒薬", "ANTIDOTE"],
+            ["回復薬", "HEALING"],
+            ["強化薬", "BOOST"]
+          ]
+        }
+      ],
+      "category": "薬学",
+      "colour": 65, // 緑色系
+      "extensions": ["colours_operators", "shape_statement"],
+      "tooltip": "調合した薬を使用します。効果は薬の種類によって異なります。"
+    });
+  }
+};
+
+Blockly.Blocks['repeat_twice'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "2回繰り返す %1 %2",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_statement",
+          "name": "STACK"
+        }
+      ],
+      "category": "制御",
+      "colour": 120,
+      "extensions": ["colours_control", "shape_statement"]
+    });
+  }
+};
+
+// 3回繰り返しブロック（ステージ9用）
+Blockly.Blocks['repeat_three_times'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": "3回繰り返す %1 %2",
+      "args0": [
+        {
+          "type": "input_dummy"
+        },
+        {
+          "type": "input_statement",
+          "name": "STACK"
+        }
+      ],
+      "category": "制御",
+      "colour": 120,
+      "extensions": ["colours_control", "shape_statement"]
+    });
+  }
+};
+
+// JavaScript code generation for blocks
+if (typeof Blockly !== 'undefined' && Blockly.JavaScript) {
+  
+  // Basic action blocks
+  Blockly.JavaScript['attack'] = function(block) {
+    return 'attack();\n';
+  };
+
+  Blockly.JavaScript['cast_spell'] = function(block) {
+    var spell = block.getFieldValue('SPELL');
+    return 'castSpell("' + spell + '");\n';
+  };
+
+  Blockly.JavaScript['heal'] = function(block) {
+    var amount = Blockly.JavaScript.valueToCode(block, 'AMOUNT', Blockly.JavaScript.ORDER_ATOMIC) || '20';
+    return 'heal(' + amount + ');\n';
+  };
+
+  Blockly.JavaScript['wait_seconds'] = function(block) {
+    var seconds = Blockly.JavaScript.valueToCode(block, 'SECONDS', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+    return 'wait(' + seconds + ');\n';
+  };
+
+  Blockly.JavaScript['wait'] = function(block) {
+    return 'wait(1);\n';
+  };
+
+  // Hand gesture blocks
+  Blockly.JavaScript['wave_left_hand'] = function(block) {
+    return 'waveLeftHand();\n';
+  };
+
+  Blockly.JavaScript['wave_right_hand'] = function(block) {
+    return 'waveRightHand();\n';
+  };
+
+  // Magic casting blocks
+  Blockly.JavaScript['cast_magic'] = function(block) {
+    var spell = block.getFieldValue('SPELL');
+    var statements = Blockly.JavaScript.statementToCode(block, 'INCANTATION');
+    return 'castMagic("' + spell + '", function() {\n' + statements + '});\n';
+  };
+
+  Blockly.JavaScript['cast_healing'] = function(block) {
+    return 'castHealing();\n';
+  };
+
+  Blockly.JavaScript['cast_healing_magic'] = function(block) {
+    var statements = Blockly.JavaScript.statementToCode(block, 'INCANTATION');
+    return 'castHealingMagic(function() {\n' + statements + '});\n';
+  };
+
+  Blockly.JavaScript['cast_fire_magic'] = function(block) {
+    var statements = Blockly.JavaScript.statementToCode(block, 'INCANTATION');
+    return 'castFireMagic(function() {\n' + statements + '});\n';
+  };
+
+  Blockly.JavaScript['cast_ice_magic'] = function(block) {
+    var statements = Blockly.JavaScript.statementToCode(block, 'INCANTATION');
+    return 'castIceMagic(function() {\n' + statements + '});\n';
+  };
+
+  // Alchemy blocks
+  Blockly.JavaScript['brew_antidote'] = function(block) {
+    return 'brewAntidote();\n';
+  };
+
+  Blockly.JavaScript['use_item'] = function(block) {
+    return 'useItem();\n';
+  };
+
+  // Control blocks
+  Blockly.JavaScript['repeat_twice'] = function(block) {
+    var statements = Blockly.JavaScript.statementToCode(block, 'STACK');
+    return 'for (var i = 0; i < 2; i++) {\n' + statements + '}\n';
+  };
+
+  // New repeat three times block
+  Blockly.JavaScript['repeat_three_times'] = function(block) {
+    var statements = Blockly.JavaScript.statementToCode(block, 'STACK');
+    return 'for (var i = 0; i < 3; i++) {\n' + statements + '}\n';
+  };
+}

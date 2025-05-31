@@ -25,10 +25,14 @@ module.exports = {
         }
       }
     }
-  },
-  devServer: {
+  },  devServer: {
     static: [
       path.join(__dirname, "dist"),
+      // publicフォルダーからアセットにアクセスできるようにする
+      {
+        directory: path.join(__dirname, "public"),
+        publicPath: "/"
+      },
       // 開発サーバーからWASMファイルにアクセスできるようにする
       { 
         directory: path.resolve(__dirname, '../wasm-game-core/pkg'),
@@ -66,8 +70,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./public/index.html"
-    }),
-    // メディアファイルをコピーするプラグインを追加
+    }),    // メディアファイルをコピーするプラグインを追加
     new CopyPlugin({
       patterns: [
         { from: "node_modules/scratch-blocks/media", to: "media" },
@@ -75,6 +78,12 @@ module.exports = {
         { 
           from: path.resolve(__dirname, "../wasm-game-core/pkg"), 
           to: "wasm-game-core/pkg",
+          noErrorOnMissing: true
+        },
+        // アセットフォルダーをコピー
+        { 
+          from: "public/assets", 
+          to: "assets",
           noErrorOnMissing: true
         },
       ],

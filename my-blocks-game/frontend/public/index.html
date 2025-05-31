@@ -15,22 +15,19 @@
     }
   </style>
 </head>
-<body>
-  <h1>ブロックで作る対戦ゲーム</h1>
+<body>  <h1>ブロックで作る対戦ゲーム</h1>
   <div class="game-container">
     <div class="game-area">
       <!-- ゲーム画面 -->
       <canvas id="gameCanvas" width="800" height="600"></canvas>
       
-      <!-- HPバー (HPバーはゲーム内に描画されているので実際は不要かもしれません) -->
-      <div style="display: none;">
+      <!-- HPバー -->
+      <div>
         <div id="playerHP">Player: 100</div>
         <div id="enemyHP">Enemy: 50</div>
       </div>
     </div>
-    
-    <div class="editor-area">
-      <!-- ブロックエディタ -->
+      <div class="editor-area">      <!-- ブロックエディタ -->
       <div id="blocklyDiv"></div>
       <button id="runButton">実行</button>
     </div>

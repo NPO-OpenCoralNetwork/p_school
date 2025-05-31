@@ -24,4 +24,14 @@
             <!-- <block type="cast_fire_magic"></block> -->
             <block type="cast_ice_magic"></block>
         </category>
+          <!-- 薬学（ステージ6以降） -->
+        <category name="薬学" id="alchemy" colour="#41a65c" secondaryColour="#2d7341">
+            <block type="brew_antidote"></block>
+            <block type="use_potion"></block>
+        </category>
+          <!-- 制御（ステージ8以降） -->
+        <category name="制御" id="control" colour="#3c9966" secondaryColour="#2d7341">
+            <block type="repeat_twice"></block>
+            <block type="repeat_three_times"></block>
+        </category>
 </xml>

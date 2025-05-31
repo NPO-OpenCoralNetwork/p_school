@@ -41,10 +41,17 @@ export class Player {
     getHP() {
       return this.hp;
     }
-    
-    // HP設定メソッド
+      // HP設定メソッド
     setHP(value) {
       this.hp = value;
+    }
+
+    // ダメージを受けるメソッド
+    takeDamage(amount) {
+      const oldHP = this.hp;
+      this.hp = Math.max(0, this.hp - amount);
+      this.ui.updateHP(this.hp, this.scene.enemy.hp);
+      return this.hp !== oldHP;
     }
   }
   

@@ -27,6 +27,10 @@ pub enum ActionType {
     WaveRightHand,
     CompleteIncantation,
     FailIncantation,
+    BrewAntidote,     // Stage 6: 解毒剤を作成
+    UsePotion,        // Stage 6: ポーションを使用
+    RepeatStart,      // 繰り返し処理開始
+    RepeatEnd,        // 繰り返し処理終了
 }
 
 // ゲームアクション
@@ -85,13 +89,12 @@ pub fn evaluate(ast_result: AstResult) -> Result<Vec<GameAction>, Box<dyn Error>
                         // 詠唱の結果を評価
                         let pattern = steps.join(",");
                         let is_correct = evaluate_incantation(spell_str, &pattern);
-                        
-                        // デバッグ出力を追加
+                          // デバッグ出力を追加
                         web_sys::console::log_1(&format!("Spell: {}, Pattern: {}, Expected: {}, IsCorrect: {}", 
                             spell_str, pattern, 
                             match spell_str {
                                 "FIRE" => "right,right,left",
-                                "ICE" => "left",
+                                "ICE" => "left,left",
                                 "THUNDER" => "right,left,right,left",
                                 _ => "unknown",
                             },
@@ -211,8 +214,7 @@ pub fn evaluate(ast_result: AstResult) -> Result<Vec<GameAction>, Box<dyn Error>
                     action_type: ActionType::CastHealingMagic,
                     parameters: serde_json::json!({ "amount": 15 }),
                 });
-            },
-            "wait_seconds" => {
+            },            "wait_seconds" => {
                 // 待機秒数のパラメータを取得（デフォルト: 1）
                 let seconds = node.fields.get("SECONDS")
                     .and_then(|v| v.as_f64())
@@ -221,6 +223,51 @@ pub fn evaluate(ast_result: AstResult) -> Result<Vec<GameAction>, Box<dyn Error>
                 actions.push(GameAction {
                     action_type: ActionType::Wait,
                     parameters: serde_json::json!({ "seconds": seconds }),
+                });
+            },
+            // Stage 6: 解毒剤を作成するブロック
+            "brew_antidote" => {
+                actions.push(GameAction {
+                    action_type: ActionType::BrewAntidote,
+                    parameters: serde_json::json!({}),
+                });
+            },
+            // Stage 6: ポーションを使用するブロック
+            "use_potion" => {
+                // ポーションタイプのパラメータを取得
+                let potion_type = node.fields.get("POTION_TYPE")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("healing");
+
+                actions.push(GameAction {
+                    action_type: ActionType::UsePotion,
+                    parameters: serde_json::json!({ "potion_type": potion_type }),
+                });
+            },
+            // 繰り返し処理: 2回繰り返す
+            "repeat_twice" => {
+                // 繰り返し開始アクションを追加
+                actions.push(GameAction {
+                    action_type: ActionType::RepeatStart,
+                    parameters: serde_json::json!({ "count": 2 }),
+                });
+                
+                // 子ノードがある場合、2回繰り返す
+                if let Some(children) = &node.children {
+                    // 1回目の繰り返し
+                    for child in children {
+                        process_node(child, actions, spell_context, steps);
+                    }
+                    // 2回目の繰り返し
+                    for child in children {
+                        process_node(child, actions, spell_context, steps);
+                    }
+                }
+                
+                // 繰り返し終了アクションを追加
+                actions.push(GameAction {
+                    action_type: ActionType::RepeatEnd,
+                    parameters: serde_json::json!({}),
                 });
             },
             _ => {}
@@ -245,7 +292,7 @@ fn evaluate_incantation(spell: &str, pattern: &str) -> bool {
     // 魔法のパターンを定義
     let expected_pattern = match spell {
         "FIRE" => "right,right,left",
-        "ICE" => "left",
+        "ICE" => "left,left",
         "THUNDER" => "right,left,right,left",
         _ => return false,
     };

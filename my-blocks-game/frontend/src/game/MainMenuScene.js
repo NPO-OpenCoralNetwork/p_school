@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
 import { BATTLE_STAGES } from './utils';
 
-export class MainMenuScene extends Phaser.Scene {
-  constructor() {
+export class MainMenuScene extends Phaser.Scene {  constructor() {
     super({ key: 'MainMenuScene' });
     this.particles = null;
-    this.emitter = null;
+    this.buttonEmitter = null;
   }
 
   preload() {
@@ -56,21 +55,21 @@ export class MainMenuScene extends Phaser.Scene {
     const bg = this.add.image(400, 300, 'menuBg')
       .setAlpha(0.3)
       .setBlendMode(Phaser.BlendModes.SCREEN);
-    
-    // パーティクルエフェクト - 背景に漂う光の粒子
-    // パーティクル画像がなければエラーが発生するため、条件付きで作成
+      // パーティクルエフェクト - 背景に漂う光の粒子
+    // Phaser 3.60 新API使用
     try {
-      this.particles = this.add.particles('particle');
-      this.emitter = this.particles.createEmitter({
+      this.particles = this.add.particles(0, 0, {
+        key: 'particle',
         x: { min: 0, max: 800 },
         y: { min: 0, max: 200 },
         scale: { start: 0.2, end: 0 },
         speed: { min: 20, max: 50 },
         angle: { min: 240, max: 300 },
         lifespan: { min: 4000, max: 6000 },
-        blendMode: Phaser.BlendModes.ADD,
+        blendMode: 'ADD',
         frequency: 500,
-        alpha: { start: 0.5, end: 0 }
+        alpha: { start: 0.5, end: 0 },
+        emitting: true
       });
     } catch (e) {
       console.warn("パーティクル画像が見つかりません。パーティクルエフェクトは無効です。", e);
@@ -298,10 +297,9 @@ export class MainMenuScene extends Phaser.Scene {
         
         // ボタンテキストの色をリセット
         buttonText.clearTint();
-        
-        // パーティクルエミッターを停止/削除
+          // パーティクルエミッターを停止/削除
         if (this.buttonEmitter) {
-          this.buttonEmitter.stop();
+          this.buttonEmitter.destroy();
           this.buttonEmitter = null;
         }
       });
@@ -321,26 +319,27 @@ export class MainMenuScene extends Phaser.Scene {
       stageContainer.add([buttonBg, innerGlow, buttonText, difficultyText, hitArea]);
     });
   }
-
   createButtonParticles(x, y) {
     // パーティクル機能がない場合は何もしない
     if (!this.particles) return;
     
-    // ボタン上のパーティクルエフェクト
+    // 既存のボタンエミッターを停止
     if (this.buttonEmitter) {
-      this.buttonEmitter.stop();
+      this.buttonEmitter.destroy();
     }
     
     try {
-      this.buttonEmitter = this.particles.createEmitter({
-        x: x,
-        y: y,
+      // Phaser 3.60 新API使用
+      this.buttonEmitter = this.add.particles(x, y, {
+        key: 'particle',
         speed: { min: -20, max: 20 },
         scale: { start: 0.1, end: 0 },
         lifespan: 1000,
-        blendMode: Phaser.BlendModes.ADD,
+        blendMode: 'ADD',
         frequency: 100,
-        alpha: { start: 0.6, end: 0 }
+        alpha: { start: 0.6, end: 0 },
+        emitting: true,
+        duration: 2000
       });
     } catch (e) {
       console.warn("パーティクルエフェクトを作成できません", e);
@@ -367,12 +366,12 @@ export class MainMenuScene extends Phaser.Scene {
     console.log(`Starting battle: ${sceneKey}`, params);
     this.scene.start(sceneKey, params);
   }
-
   hideBlockEditor() {
     // ブロックエディタを非表示
     const blocklyDiv = document.getElementById('blocklyDiv');
     if (blocklyDiv) {
       blocklyDiv.style.display = 'none';
+      blocklyDiv.style.visibility = 'hidden';
     }
     
     // 実行ボタンも非表示に

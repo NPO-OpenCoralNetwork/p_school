@@ -8,14 +8,12 @@
     "build": "webpack serve --config webpack.config.js --mode development",
     "build:wasm": "cd \"../wasm-game-core\" && wasm-pack build --target web",
     "dev": "npm run build:wasm && npm run start"
-    
-
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "phaser": "^3.88.2",
     "scratch-blocks": "^1.1.210",
     "scratch-vm": "^5.0.290"
@@ -34,8 +32,6 @@
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1"
-
-
   },
   "description": ""
 }

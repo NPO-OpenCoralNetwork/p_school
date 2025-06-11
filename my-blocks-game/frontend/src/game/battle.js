@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Player } from "./player";
 import { Enemy } from "./enemy";
 import { UI } from "./ui";
+import { SpellBook } from "./SpellBook";
 
 export class BattleScene extends Phaser.Scene {
   constructor(config) {
@@ -13,7 +14,7 @@ export class BattleScene extends Phaser.Scene {
     this.settings = {
       background: 'forest',
       enemy: 'goblin',
-      scratchMode: false,
+      scratchMode: true, // デフォルトでtrueに変更
       stageNumber: 1
     };
     
@@ -21,30 +22,65 @@ export class BattleScene extends Phaser.Scene {
     this.player = null;
     this.enemy = null;
     this.ui = null;
+    
+    // 魔法の書の初期化
+    this.spellBook = new SpellBook();
+
+    // 魔法の書を開くボタンを作成するフラグ
+    this.spellBookButton = null;
   }
 
   init(data) {
     // データがあれば設定を更新
     this.settings = { ...this.settings, ...data };
+    // 確実にscratchModeを有効にする
+    this.settings.scratchMode = true;
     console.log('Battle initialized with settings:', this.settings);
   }
 
   preload() {
-    // バトル用アセットをロード
-    this.load.image('battleBg', 'assets/battle-background.png');
+    // アセット読み込みエラーのハンドリング
+    this.load.on('loaderror', (file) => {
+      console.warn(`Failed to load asset: ${file.src}`);
+    });
+
+    // バトル用アセットをロード（エラー時のフォールバック付き）
+    this.load.image('battleBg', 'assets/bg1.png');
     this.load.image('player', 'assets/player.png');
-    this.load.image('enemy', 'assets/enemy.png');
+    this.load.image('enemy', 'assets/srime.png');
     
-    // UI要素
-    this.load.image('buttonBg', 'assets/button.png');
-    this.load.image('hpBarFrame', 'assets/hp-bar-frame.png'); // HPバーのフレーム画像
-    this.load.image('panelBg', 'assets/panel-bg.png'); // パネル背景
+    // UI要素（オプショナル）
+    try {
+      this.load.image('buttonBg', 'assets/button.png');
+    } catch (e) {
+      console.warn('button.png not found, using fallback');
+    }
     
-    // エフェクト用アセット
-    this.load.image('particle', 'assets/particle.png'); // パーティクルエフェクト用画像
+    try {
+      this.load.image('hpBarFrame', 'assets/hp-bar-frame.png');
+    } catch (e) {
+      console.warn('hp-bar-frame.png not found, using fallback');
+    }
     
-    // 魔法の書の画像をロード
-    this.load.image('spellbook', 'assets/spellbook.png');
+    try {
+      this.load.image('panelBg', 'assets/panel-bg.png');
+    } catch (e) {
+      console.warn('panel-bg.png not found, using fallback');
+    }
+    
+    // エフェクト用アセット（オプショナル）
+    try {
+      this.load.image('particle', 'assets/particle.png');
+    } catch (e) {
+      console.warn('particle.png not found, using fallback');
+    }
+    
+    // 魔法の書の画像をロード（オプショナル）
+    try {
+      this.load.image('spellbook', 'assets/spellbook.png');
+    } catch (e) {
+      console.warn('spellbook.png not found, using fallback');
+    }
     
     // モダンなWebフォントの読み込み (Google Fontsなど外部フォントがある場合)
     // 注意: Google Fontsを使う場合はindex.htmlにフォントのリンクを追加する必要があります
@@ -52,19 +88,135 @@ export class BattleScene extends Phaser.Scene {
   }
 
   create() {
-    // ブロックエディタを表示
-    this.showBlockEditor();
-    
-    // 背景
-    this.add.image(400, 300, 'battleBg').setDisplaySize(800, 600);
+    // ゲーム画面のレイアウトを設定
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+      gameContainer.style.display = 'flex';
+      gameContainer.style.flexDirection = 'row';
+    }
 
-    // プレイヤーと敵のスプライト
-    this.playerSprite = this.add.sprite(200, 400, 'player').setScale(2);
-    this.enemySprite = this.add.sprite(600, 200, 'enemy').setScale(2);
+    // ブロックエディタを表示（scratchModeが有効な場合のみ）
+    if (this.settings.scratchMode) {
+      console.log("scratchMode is enabled, setting up block editor");
+      const blocklyDiv = document.getElementById('blocklyDiv');
+      if (blocklyDiv) {
+        console.log("Found blocklyDiv, applying styles");
+        blocklyDiv.style.width = '550px'; // CSSと合わせる
+        blocklyDiv.style.height = '600px';
+        blocklyDiv.style.position = 'relative';
+        blocklyDiv.style.display = 'block';
+        blocklyDiv.style.visibility = 'visible';
+        console.log("blocklyDiv after styling:", blocklyDiv.style.cssText);
+      } else {
+        console.error("blocklyDiv not found in create method!");
+      }
+      this.showBlockEditor();
+    } else {
+      console.log("scratchMode is disabled");
+    }
     
-    // キャラクターに影をつける
-    this.playerSprite.setAlpha(0.9);
-    this.enemySprite.setAlpha(0.9);
+    // 背景の設定（アセットの読み込み確認付き）
+    if (this.textures.exists('battleBg')) {
+      this.add.image(400, 300, 'battleBg').setDisplaySize(800, 600);
+    } else {
+      // フォールバック: 単色の背景を作成
+      const bg = this.add.graphics();
+      bg.fillStyle(0x1a1a2e);
+      bg.fillRect(0, 0, 800, 600);
+      console.warn('battleBg asset not found, using fallback background');
+    }
+
+    // プレイヤーと敵のスプライト（フォールバック付き）
+    if (this.textures.exists('player')) {
+      this.playerSprite = this.add.sprite(200, 400, 'player');
+      // プレイヤースプライトのサイズを120x120ピクセルに設定
+      this.playerSprite.setDisplaySize(120, 120);
+    } else {
+      // フォールバック: 円形のプレイヤー
+      const playerGraphics = this.add.graphics();
+      playerGraphics.fillStyle(0x00ff00);
+      playerGraphics.fillCircle(200, 400, 60);
+      this.playerSprite = playerGraphics;
+      console.warn('player asset not found, using fallback graphics');
+    }
+    
+    if (this.textures.exists('enemy')) {
+      this.enemySprite = this.add.sprite(600, 200, 'enemy');
+      // 敵スプライトのサイズを100x100ピクセルに設定
+      this.enemySprite.setDisplaySize(100, 100);
+    } else {
+      // フォールバック: 円形の敵
+      const enemyGraphics = this.add.graphics();
+      enemyGraphics.fillStyle(0xff0000);
+      enemyGraphics.fillCircle(600, 200, 50);
+      this.enemySprite = enemyGraphics;
+      console.warn('enemy asset not found, using fallback graphics');
+    }
+    
+    // キャラクターに影をつける（スプライトの場合のみ）
+    if (this.playerSprite.setAlpha) {
+      this.playerSprite.setAlpha(0.9);
+    }
+    if (this.enemySprite.setAlpha) {
+      this.enemySprite.setAlpha(0.9);
+    }
+
+    // 魔法の書ボタンを作成（右上に配置）
+    const spellBookContainer = this.add.container(710, 50);
+    
+    const buttonBg = this.add.graphics();
+    buttonBg.fillStyle(0x2a1810, 0.8);
+    buttonBg.lineStyle(2, 0x8b6914);
+    buttonBg.fillRoundedRect(-40, -20, 80, 40, 10);
+    buttonBg.strokeRoundedRect(-40, -20, 80, 40, 10);
+    
+    const buttonText = this.add.text(0, 0, '📖', {
+      fontSize: '24px',
+      fill: '#ffd700'
+    }).setOrigin(0.5);
+    
+    const buttonLabel = this.add.text(0, 22, '魔法の書', {
+      fontSize: '12px',
+      fill: '#ffd700',
+      fontFamily: 'Georgia, serif'
+    }).setOrigin(0.5);
+    
+    spellBookContainer.add([buttonBg, buttonText, buttonLabel]);
+    spellBookContainer.setInteractive(new Phaser.Geom.Rectangle(-40, -20, 80, 40), Phaser.Geom.Rectangle.Contains);
+    
+    spellBookContainer.on('pointerover', () => {
+      buttonBg.clear();
+      buttonBg.fillStyle(0x3a2820, 0.8);
+      buttonBg.lineStyle(2, 0x8b6914);
+      buttonBg.fillRoundedRect(-40, -20, 80, 40, 10);
+      buttonBg.strokeRoundedRect(-40, -20, 80, 40, 10);
+      this.tweens.add({
+        targets: buttonText,
+        y: -2,
+        duration: 100,
+        ease: 'Power1'
+      });
+    });
+    
+    spellBookContainer.on('pointerout', () => {
+      buttonBg.clear();
+      buttonBg.fillStyle(0x2a1810, 0.8);
+      buttonBg.lineStyle(2, 0x8b6914);
+      buttonBg.fillRoundedRect(-40, -20, 80, 40, 10);
+      buttonBg.strokeRoundedRect(-40, -20, 80, 40, 10);
+      this.tweens.add({
+        targets: buttonText,
+        y: 0,
+        duration: 100,
+        ease: 'Power1'
+      });
+    });
+    
+    spellBookContainer.on('pointerdown', () => {
+      this.spellBook.toggle();
+    });
+    
+    this.spellBookButton = spellBookContainer;
     
     // プレイヤー名とレベル表示 - 位置を調整（キャラクターからより離す）
     // this.playerNameText = this.add.text(200, 320, 'PLAYER', { 
@@ -972,9 +1124,6 @@ export class BattleScene extends Phaser.Scene {
     const x = this.playerSprite.x;
     const y = this.playerSprite.y;
     
-    // 回復エフェクト用のパーティクルエミッター作成
-    const particles = this.add.particles('healParticle');
-    
     // パーティクルの画像がない場合は、シェイプを代用
     if (!this.textures.exists('healParticle')) {
       this.make.graphics({ x: 0, y: 0, add: false })
@@ -983,10 +1132,9 @@ export class BattleScene extends Phaser.Scene {
         .generateTexture('healParticle', 16, 16);
     }
     
-    // エミッター設定
-    const emitter = particles.createEmitter({
-      x: x,
-      y: y,
+    // Phaser 3.60 新API使用 - 回復エフェクト用のパーティクルエミッター作成
+    const particles = this.add.particles(x, y, {
+      key: 'healParticle',
       speed: { min: 50, max: 100 },
       scale: { start: 0.5, end: 0 },
       alpha: { start: 0.8, end: 0 },
@@ -997,7 +1145,9 @@ export class BattleScene extends Phaser.Scene {
       rotate: { min: 0, max: 360 },
       angle: { min: 0, max: 360 },
       radial: true,
-      gravityY: -50
+      gravityY: -50,
+      emitting: true,
+      duration: 2000
     });
     
     // 光のオーラエフェクト
@@ -1117,23 +1267,57 @@ export class BattleScene extends Phaser.Scene {
   // ブロックエディタを表示
   showBlockEditor() {
     console.log("Showing block editor and UI elements");
+    
     // ブロックエディタを表示
     const blocklyDiv = document.getElementById('blocklyDiv');
     if (blocklyDiv) {
+      console.log("Setting blocklyDiv display to block");
       blocklyDiv.style.display = 'block';
+      blocklyDiv.style.visibility = 'visible';
+      console.log("blocklyDiv display:", blocklyDiv.style.display);
+    } else {
+      console.error("blocklyDiv not found!");
     }
     
     // 実行ボタンを表示
     const runButton = document.getElementById('runButton');
     if (runButton) {
+      console.log("Setting runButton display to block");
       runButton.style.display = 'block';
       runButton.disabled = false; // 確実にボタンを有効化
+      console.log("runButton display:", runButton.style.display);
+    } else {
+      console.error("runButton not found!");
     }
     
     // HPバーを表示
     const playerHP = document.getElementById('playerHP');
     const enemyHP = document.getElementById('enemyHP');
-    if (playerHP) playerHP.style.display = 'block';
-    if (enemyHP) enemyHP.style.display = 'block'; // 修正: enemyHP.style.displayに変更
+    if (playerHP) {
+      console.log("Setting playerHP display to block");
+      playerHP.style.display = 'block';
+    } else {
+      console.error("playerHP not found!");
+    }
+    if (enemyHP) {
+      console.log("Setting enemyHP display to block");
+      enemyHP.style.display = 'block';
+    } else {
+      console.error("enemyHP not found!");
+    }
+  }
+  
+  shutdown() {
+    // シーン破棄時の処理
+    if (this.spellBook) {
+      this.spellBook.hide();  // 魔法の書を非表示に
+    }
+  }
+  
+  destroy() {
+    // シーン完全破棄時の処理
+    if (this.spellBook) {
+      this.spellBook.hide();  // 魔法の書を非表示に
+    }
   }
 }

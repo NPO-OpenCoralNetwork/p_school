@@ -133,6 +133,4 @@ export class GameDesign {
     this.ctx.font = '16px Arial'
     this.ctx.textAlign = 'center'
     this.ctx.fillText('ブロックを組み合わせて戦闘プログラムを作成しよう！', 400, 85)
-    this
-  }
-}
+    this}}

@@ -1,9 +1,6 @@
 // index.js - メインアプリケーション
-// index.js - メインアプリケーション
 import { signIn, signUp, signOut, getProfile, updateExperience, addBadge } from './lib/profile.js'
 import { GameEngine } from './lib/main.js'
-
-// 以下はそのまま
 
 // ログイン・プロフィール管理
 class GameLoginManager {
@@ -347,8 +344,122 @@ class GameLoginManager {
   }
 }
 
-// ゲーム初期化
-window.gameLoginManager = new GameLoginManager();
+// Blockly 初期化
+window.onload = () => {
+  console.log("Loading Blockly workspace...");
+  
+  // toolboxの設定
+  let toolbox;
+  try {
+    const parser = new DOMParser();
+    toolbox = parser.parseFromString(toolboxXmlString, "text/xml").documentElement;
+    console.log("Toolbox loaded:", toolbox);
+  } catch (e) {
+    console.error("Error parsing toolbox:", e);
+  }
+  
+  // Blocklyワークスペースの初期化
+  console.log("Initializing Blockly workspace...");
+  const blocklyDiv = document.getElementById("blocklyDiv");
+  console.log("BlocklyDiv element:", blocklyDiv);
+  
+  // blocklyDivを確実に表示状態にする
+  if (blocklyDiv) {
+    blocklyDiv.style.display = 'block';
+    blocklyDiv.style.visibility = 'visible';
+    blocklyDiv.style.width = '550px';
+    blocklyDiv.style.height = '600px';
+    console.log("BlocklyDiv display style set to:", blocklyDiv.style.display);
+  }
+  
+  const workspace = Blockly.inject("blocklyDiv", {
+    toolbox: toolbox,
+    media: "./media/",
+    scrollbars: true,
+    horizontalLayout: false,
+    sounds: true,
+    zoom: {
+      controls: true,
+      wheel: true,
+      startScale: 0.75,
+      maxScale: 4,
+      minScale: 0.25,
+      scaleSpeed: 1.1
+    }
+  });
+  
+  console.log("Workspace created:", workspace);
+  
+  // リサイズ処理を追加
+  window.addEventListener('resize', function() {
+    // 遅延してリサイズを適用（ブラウザのサイズ変更中に何度も実行されるのを防ぐ）
+    if (window.resizeTimeout) {
+      clearTimeout(window.resizeTimeout);
+    }
+    window.resizeTimeout = setTimeout(function() {
+      Blockly.svgResize(workspace);
+    }, 250);
+  });
+  
+  // カテゴリ選択時のスクロール機能を追加
+  setupCategoryScrolling(workspace);
+  
+  // Phaser ゲーム起動
+  const config = {
+    type: Phaser.CANVAS,
+    width: 800,
+    height: 600,
+    canvas: document.getElementById('gameCanvas'),
+    scene: [MainMenuScene, BattleScene, BattleScene2, BattleScene3, BattleScene4, BattleScene5]  // BattleScene5を追加
+  };
+  
+  // ゲームインスタンスを作成
+  const game = new Phaser.Game(config);
+  
+  // コマンド実行関数を共通化
+  const executeCommands = async () => {
+    console.log("Run button clicked - executing commands");
+    const ast = await getASTFromWorkspace(workspace);
+    
+    // 利用可能なシーンを確認
+    const scenes = game.scene.getScenes();
+    console.log("Available scenes:", scenes.map(scene => scene.scene.key));
+    
+    // アクティブなシーンを全て取得
+    const activeScenes = scenes.filter(scene => scene.scene.isActive());
+    console.log("Active scenes:", activeScenes.map(scene => scene.scene.key));
+    
+    // 現在有効なステージ名の配列（優先度順）
+    const battleSceneKeys = ['Stage5Battle', 'Stage4Battle', 'Stage3Battle', 'Stage2Battle', 'BattleScene'];
+    
+    // アクティブなバトルシーンを探す (Stage3Battle または Stage2Battle または BattleScene)
+    // battleSceneKeysの順で優先的に探す
+    let battleScene = null;
+    for (const key of battleSceneKeys) {
+      battleScene = activeScenes.find(scene => scene.scene.key === key);
+      if (battleScene) {
+        console.log(`Found active battle scene: ${key}`);
+        break;
+      }
+    }
+
+    if (battleScene) {
+      // バトルシーンでコマンドを実行
+      battleScene.executeBlocklyCommands(ast);
+    } else {
+      console.warn('バトルシーンがアクティブではありません。コマンドは実行できません。');
+    }
+  };
+  
+  // 「実行」ボタンにイベントリスナーを追加
+  document.getElementById("runButton").addEventListener("click", executeCommands);
+  
+  // カスタムイベントも購読（BattleScene2からも実行できるように）
+  document.addEventListener("blockly-run", executeCommands);
+
+  // ゲーム初期化
+  window.gameLoginManager = new GameLoginManager();
+};
 
 // 既存のindex.jsから呼び出される関数（グローバルに公開）
 window.addGameExperience = (points) => {

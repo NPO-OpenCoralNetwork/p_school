@@ -37,10 +37,19 @@ body {
 }
 
 #blocklyDiv {
-  height: 600px !important; /* ゲーム画面に合わせて高さを調整 */
-  width: 550px !important; /* 幅を少し広げる */
-  display: block; /* Blocklyエディタを表示状態にする */
+  height: 600px; /* ゲーム画面に合わせて高さを調整 */
+  width: 550px; /* 幅を少し広げる */
+  display: none; /* デフォルトでは非表示 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 少し影をつけて立体感を出す */
+}
+
+/* Blockly関連の要素を確実に表示 */
+.blocklyToolboxDiv {
+  display: block !important;
+}
+
+.blocklyMainBackground {
+  display: block !important;
 }
 #logArea {
   width: 100%;
@@ -64,6 +73,7 @@ button {
   transition: all 0.2s;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   letter-spacing: 1px;
+  display: none; /* デフォルトでは非表示 */
 }
 button:hover {
   background-color: #3367d6;
@@ -72,6 +82,7 @@ button:hover {
 }
 #playerHP, #enemyHP {
   margin: 5px;
+  display: none; /* デフォルトでは非表示 */
 }
 
 /* Blocklyツールボックスのスタイルカスタマイズ */

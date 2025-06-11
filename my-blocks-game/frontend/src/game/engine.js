@@ -4,6 +4,8 @@ import { BattleScene } from "./battle";
 import { BattleScene2 } from "./BattleScene2";
 import { BattleScene4 } from "./BattleScene4";
 import { BattleScene5 } from "./BattleScene5";
+import { BattleScene6 } from "./BattleScene6";
+import { BattleScene7 } from "./BattleScene7";
 
 // 初期化時にWASMをロード
 (async function() {
@@ -107,10 +109,23 @@ export async function runGameWithCommands(ast, game, ui) {
     }
     
     // 敵のターン
-    await game.enemy.takeTurn();
-  } catch (error) {
+    await game.enemy.takeTurn();  } catch (error) {
     console.error("Error running game commands:", error);
     ui.log("エラーが発生しました: " + error.message);
+  }
+}
+
+// 薬の表示名を取得するヘルパー関数
+function getPotionDisplayName(potionType) {
+  switch (potionType) {
+    case "ANTIDOTE":
+      return "解毒薬";
+    case "HEALING":
+      return "回復薬";
+    case "BOOST":
+      return "強化薬";
+    default:
+      return "薬";
   }
 }
 
@@ -118,14 +133,37 @@ export async function runGameWithCommands(ast, game, ui) {
 async function executeGameAction(action, game, ui) {
   const { action_type, parameters } = action;
   
-  switch (action_type) {
-    case "Attack":
-      await game.player.attack();
+  switch (action_type) {    case "Attack":
+      // Use scene's handlePlayerAction if available (for BattleScene5, BattleScene6, etc.)
+      if (game.scene && typeof game.scene.handlePlayerAction === 'function') {
+        console.log("Using scene's handlePlayerAction for Attack");
+        try {
+          await game.scene.handlePlayerAction("Attack", parameters);
+        } catch (e) {
+          console.error("Error calling scene's handlePlayerAction for Attack:", e);
+          // Fallback to player's attack method
+          await game.player.attack();
+        }
+      } else {
+        await game.player.attack();
+      }
       break;
       
     case "Heal":
       const healAmount = parameters.amount || 10;
-      await game.player.heal(healAmount);
+      // Use scene's handlePlayerAction if available (for BattleScene5, BattleScene6, etc.)
+      if (game.scene && typeof game.scene.handlePlayerAction === 'function') {
+        console.log("Using scene's handlePlayerAction for Heal");
+        try {
+          await game.scene.handlePlayerAction("Heal", { amount: healAmount });
+        } catch (e) {
+          console.error("Error calling scene's handlePlayerAction for Heal:", e);
+          // Fallback to player's heal method
+          await game.player.heal(healAmount);
+        }
+      } else {
+        await game.player.heal(healAmount);
+      }
       break;
         case "Wait":
       const seconds = parameters.seconds || 1;
@@ -212,6 +250,75 @@ async function executeGameAction(action, game, ui) {
         console.log("No healPlayer method on scene, using player's heal method instead");
         await game.player.heal(healPower);
       }
+      break;
+        case "BrewAntidote":
+      ui.log("解毒薬を調合中...");
+      // Use scene's handlePlayerAction if available (for BattleScene6, etc.)
+      if (game.scene && typeof game.scene.handlePlayerAction === 'function') {
+        console.log("Using scene's handlePlayerAction for BrewAntidote");
+        try {
+          await game.scene.handlePlayerAction("BrewAntidote", parameters);
+        } catch (e) {
+          console.error("Error calling scene's handlePlayerAction for BrewAntidote:", e);
+          // Fallback
+          if (game.scene && typeof game.scene.brewAntidote === 'function') {
+            await game.scene.brewAntidote();
+          } else {
+            ui.log("解毒薬を調合しました！");
+            await delay(1000);
+          }
+        }
+      } else if (game.scene && typeof game.scene.brewAntidote === 'function') {
+        console.log("Using scene's brewAntidote method");
+        try {
+          await game.scene.brewAntidote();
+        } catch (e) {
+          console.error("Error calling scene's brewAntidote method:", e);
+          ui.log("解毒薬の調合に失敗しました");
+        }
+      } else {
+        ui.log("解毒薬を調合しました！");
+        await delay(1000);
+      }
+      break;
+        case "UsePotion":
+      const potionType = parameters.potion_type || "ANTIDOTE";
+      ui.log(`${getPotionDisplayName(potionType)}を使用します`);
+      // Use scene's handlePlayerAction if available (for BattleScene6, etc.)
+      if (game.scene && typeof game.scene.handlePlayerAction === 'function') {
+        console.log("Using scene's handlePlayerAction for UsePotion");
+        try {
+          await game.scene.handlePlayerAction("UsePotion", parameters);
+        } catch (e) {
+          console.error("Error calling scene's handlePlayerAction for UsePotion:", e);
+          // Fallback
+          if (game.scene && typeof game.scene.usePotion === 'function') {
+            await game.scene.usePotion(potionType);
+          } else {
+            ui.log(`${getPotionDisplayName(potionType)}の効果が発動しました！`);
+            await delay(1000);
+          }
+        }
+      } else if (game.scene && typeof game.scene.usePotion === 'function') {
+        console.log("Using scene's usePotion method with type:", potionType);
+        try {
+          await game.scene.usePotion(potionType);
+        } catch (e) {
+          console.error("Error calling scene's usePotion method:", e);
+          ui.log("薬の使用に失敗しました");
+        }
+      } else {
+        ui.log(`${getPotionDisplayName(potionType)}の効果が発動しました！`);
+        await delay(1000);
+      }
+      break;
+      
+    case "RepeatStart":
+      ui.log("繰り返し処理を開始");
+      break;
+
+    case "RepeatEnd":
+      ui.log("繰り返し処理を終了");
       break;
       
     default:
@@ -305,12 +412,26 @@ function evaluateAstJs(parsedAst) {
           parameters: {}
         });
         break;
-        
-      case "wave_right_hand":
+          case "wave_right_hand":
         currentIncantation.push("right");
         actions.push({
           action_type: "WaveRightHand",
           parameters: {}
+        });
+        break;
+        
+      case "brew_antidote":
+        actions.push({
+          action_type: "BrewAntidote",
+          parameters: {}
+        });
+        break;
+        
+      case "use_potion":
+        const potionType = fields.POTION_TYPE || "ANTIDOTE";
+        actions.push({
+          action_type: "UsePotion",
+          parameters: { potion_type: potionType }
         });
         break;
     }

@@ -345,47 +345,66 @@ class GameLoginManager {
   }
 
   setupEventListeners() {
-    // ログインボタン
-    document.getElementById('loginButton').addEventListener('click', () => {
-      this.handleLogin();
-    });
-
-    // 新規登録ボタン
-    document.getElementById('signupButton').addEventListener('click', () => {
-      this.handleSignup();
-    });
-
-    // ログアウトボタン
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      this.handleLogout();
-    });
-
-    // プロフィール表示切り替え
-    document.getElementById('profileToggle').addEventListener('click', () => {
-      this.toggleProfile();
-    });
-
-    // フォーム切り替え
-    document.getElementById('showSignupForm').addEventListener('click', () => {
-      this.showSignupForm();
-    });
-
-    document.getElementById('showLoginForm').addEventListener('click', () => {
-      this.showLoginForm();
-    });
-
-    // エンターキーでログイン
-    document.getElementById('loginPassword').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+    // 要素の存在チェック付きでイベントリスナーを追加
+    const loginButton = document.getElementById('loginButton');
+    if (loginButton) {
+      loginButton.addEventListener('click', () => {
         this.handleLogin();
-      }
-    });
+      });
+    }
 
-    document.getElementById('signupPassword').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+    const signupButton = document.getElementById('signupButton');
+    if (signupButton) {
+      signupButton.addEventListener('click', () => {
         this.handleSignup();
-      }
-    });
+      });
+    }
+
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+      logoutButton.addEventListener('click', () => {
+        this.handleLogout();
+      });
+    }
+
+    const profileToggle = document.getElementById('profileToggle');
+    if (profileToggle) {
+      profileToggle.addEventListener('click', () => {
+        this.toggleProfile();
+      });
+    }
+
+    const showSignupForm = document.getElementById('showSignupForm');
+    if (showSignupForm) {
+      showSignupForm.addEventListener('click', () => {
+        this.showSignupForm();
+      });
+    }
+
+    const showLoginForm = document.getElementById('showLoginForm');
+    if (showLoginForm) {
+      showLoginForm.addEventListener('click', () => {
+        this.showLoginForm();
+      });
+    }
+
+    const loginPassword = document.getElementById('loginPassword');
+    if (loginPassword) {
+      loginPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.handleLogin();
+        }
+      });
+    }
+
+    const signupPassword = document.getElementById('signupPassword');
+    if (signupPassword) {
+      signupPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.handleSignup();
+        }
+      });
+    }
   }
 
   showSignupForm() {
@@ -637,26 +656,29 @@ class GameLoginManager {
   }
 }
 
-// ゲームログイン管理の初期化
-window.gameLoginManager = new GameLoginManager();
+// DOMContentLoadedイベントでログイン管理を初期化
+document.addEventListener('DOMContentLoaded', () => {
+  // ゲームログイン管理の初期化
+  window.gameLoginManager = new GameLoginManager();
 
-// 既存のindex.jsから呼び出される関数（グローバルに公開）
-window.addGameExperience = (points) => {
-  return window.gameLoginManager.addExperience(points);
-};
+  // 既存のindex.jsから呼び出される関数（グローバルに公開）
+  window.addGameExperience = (points) => {
+    return window.gameLoginManager.addExperience(points);
+  };
 
-// ステージクリア時のバッジ追加関数も公開
-window.addStageBadge = async (stageName) => {
-  if (window.gameLoginManager.currentProfile) {
-    try {
-      const badgeName = `${stageName}初回クリア`;
-      const updatedProfile = await addBadge(badgeName);
-      if (updatedProfile && updatedProfile.length > 0) {
-        window.gameLoginManager.currentProfile = updatedProfile[0];
-        window.gameLoginManager.updateProfileDisplay();
+  // ステージクリア時のバッジ追加関数も公開
+  window.addStageBadge = async (stageName) => {
+    if (window.gameLoginManager.currentProfile) {
+      try {
+        const badgeName = `${stageName}初回クリア`;
+        const updatedProfile = await addBadge(badgeName);
+        if (updatedProfile && updatedProfile.length > 0) {
+          window.gameLoginManager.currentProfile = updatedProfile[0];
+          window.gameLoginManager.updateProfileDisplay();
+        }
+      } catch (error) {
+        console.error('ステージバッジ追加エラー:', error);
       }
-    } catch (error) {
-      console.error('ステージバッジ追加エラー:', error);
     }
-  }
-};
+  };
+});

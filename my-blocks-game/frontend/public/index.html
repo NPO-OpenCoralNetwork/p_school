@@ -1,38 +1,124 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>  <meta charset="UTF-8">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ブロックバトルゲーム</title>
-  <style>
-    #playerHP, #enemyHP {
-      margin: 5px;
-      font-weight: bold;
-    }
-    h1 {
-      color: #3a3a3a;
-      text-align: center;
-      margin: 15px 0;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-  </style>
+  <!-- 外部CSSファイルを読み込み -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>  <h1>ブロックで作る対戦ゲーム</h1>
-  <div class="game-container">
-    <div class="game-area">
-      <!-- ゲーム画面 -->
-      <canvas id="gameCanvas" width="800" height="600"></canvas>
+<body>
+  <!-- ログイン画面 -->
+  <div id="loginScreen">
+    <div class="login-container">
+      <h2>🎮 ブロックバトルゲーム</h2>
       
-      <!-- HPバー -->
-      <div>
-        <div id="playerHP">Player: 100</div>
-        <div id="enemyHP">Enemy: 50</div>
+      <!-- ログインフォーム -->
+      <div id="loginForm" class="login-form">
+        <p>ログインしてゲームを始めましょう！</p>
+        
+        <input type="email" id="loginEmail" class="login-input" placeholder="メールアドレス" required>
+        <input type="password" id="loginPassword" class="login-input" placeholder="パスワード" required>
+        
+        <div>
+          <button id="loginButton" class="login-button">ログイン</button>
+        </div>
+        
+        <div class="form-toggle">
+          初回の方は <a id="showSignupForm">新規登録</a>
+        </div>
       </div>
+
+      <!-- 新規登録フォーム -->
+      <div id="signupForm" class="signup-form">
+        <p>新規アカウントを作成</p>
+        
+        <input type="text" id="signupUsername" class="login-input" placeholder="ユーザー名" required>
+        <input type="text" id="signupName" class="login-input" placeholder="表示名" required>
+        <input type="email" id="signupEmail" class="login-input" placeholder="メールアドレス" required>
+        <input type="password" id="signupPassword" class="login-input" placeholder="パスワード（6文字以上）" required>
+        
+        <div>
+          <button id="signupButton" class="login-button signup-button">新規登録</button>
+        </div>
+        
+        <div class="form-toggle">
+          既にアカウントをお持ちの方は <a id="showLoginForm">ログイン</a>
+        </div>
+      </div>
+      
+      <div id="authError" style="color: red; margin-top: 10px; display: none;"></div>
+      <div id="authSuccess" style="color: green; margin-top: 10px; display: none;"></div>
     </div>
-      <div class="editor-area">      <!-- ブロックエディタ -->
-      <div id="blocklyDiv"></div>
-      <button id="runButton">実行</button>
+  </div>
+
+  <!-- メインゲーム画面 -->
+  <div id="gameScreen" style="display: none;">
+    <h1>ブロックで作る対戦ゲーム</h1>
+    
+    <div class="game-container">
+      <div class="game-area">
+        <!-- ゲーム画面 -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- HPバー -->
+        <div>
+          <div id="playerHP">Player: 100</div>
+          <div id="enemyHP">Enemy: 50</div>
+        </div>
+
+        <!-- プロフィール表示エリア -->
+        <div class="profile-area">
+          <button id="profileToggle" class="profile-toggle">👤 プロフィール表示</button>
+          
+          <div id="profileContent" class="profile-content">
+            <div class="profile-item">
+              <span class="profile-label">プレイヤー名:</span>
+              <span id="profileName" class="profile-value">-</span>
+              <button id="logoutButton" class="logout-button">ログアウト</button>
+            </div>
+            
+            <div class="profile-item">
+              <span class="profile-label">レベル:</span>
+              <span id="profileLevel" class="profile-value">Lv.0</span>
+            </div>
+            
+            <div class="profile-item">
+              <span class="profile-label">経験値:</span>
+              <span id="profileExp" class="profile-value">0</span>
+            </div>
+            
+            <div class="exp-bar-container">
+              <div class="exp-bar-bg">
+                <div id="expBar" class="exp-bar"></div>
+              </div>
+              <small id="expToNext">次のレベルまで: 100</small>
+            </div>
+            
+            <div class="profile-item">
+              <span class="profile-label">🏆 トロフィー:</span>
+              <span id="profileTrophies" class="profile-value">0</span>
+            </div>
+            
+            <div class="badges-container">
+              <div class="profile-label" style="margin-bottom: 5px;">🎖️ バッジ:</div>
+              <div id="profileBadges"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+        
+      <div class="editor-area">
+        <!-- ブロックエディタ -->
+        <div id="blocklyDiv"></div>
+        <button id="runButton">🚀 実行</button>
+      </div>
     </div>
   </div>
   
   <xml id="toolbox" style="display: none"></xml>
+
+  <!-- 外部JavaScriptファイルを読み込み -->
+  <script type="module" src="index.js"></script>
 </body>
 </html>

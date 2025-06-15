@@ -1,25 +1,33 @@
-// WASM Game Coreモジュールのロード
-let wasmModule = null;
-let isInitialized = false;
+// wasm-game-coreの初期化関数をimport
+import init from '../../../wasm-game-core/pkg/wasm_game_core.js';
 
-// モジュール初期化関数
+let isInitialized = false;
+let wasmModule = null;
+
 export async function initWasm() {
-  if (isInitialized) return;
+  if (!isInitialized) {
+    // init関数を呼び出してWASMモジュール初期化
+    await init();
+    isInitialized = true;
+  }
 
   try {
-    // 動的インポート - パスを修正
-    // 相対パスを使用
     const wasm = await import('../../../wasm-game-core/pkg/wasm_game_core.js');
-    // モジュール初期化を待つ
-    await wasm.default();
+    if (wasm.__wbindgen_start) {
+      wasm.__wbindgen_start();
+    }
     wasmModule = wasm;
-    isInitialized = true;
     console.log("WASM Game Core initialized successfully");
   } catch (err) {
     console.error("Failed to load WASM module:", err);
     throw err;
   }
 }
+
+// ...以下省略
+
+
+
 
 // AST解析関数
 export async function parseAst(astJson) {

@@ -2,7 +2,7 @@ mod ast;
 mod magic;
 mod utils;
 
-wasm-pack build --target bundler
+
 
 use wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};

@@ -1,10 +1,26 @@
 // profile.js - プロフィール管理機能
 import { supabase } from './supabase.js'
 
-// ユーザー登録
+// ユーザーログイン
+export const signIn = async (email, password) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+    
+    if (error) throw error
+    return data
+  } catch (error) {
+    console.error('ログインエラー:', error)
+    throw error
+  }
+}
+
+// ユーザー登録（プロフィール作成部分を削除）
 export const signUp = async (email, password, username, name) => {
   try {
-    // Supabase Authでユーザー登録
+    // Supabase Authでユーザー登録のみ
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -18,37 +34,8 @@ export const signUp = async (email, password, username, name) => {
     
     if (error) throw error
     
-    // プロフィール作成部分
-    if (data.user && data.session) {
-      // 既存プロフィールをチェック
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .single()
-      
-      // プロフィールが存在しない場合のみ作成
-      if (!existingProfile) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              username: username,
-              name: name,
-              experience_points: 0,
-              trophy_count: 0,
-              badges: []
-            }
-          ])
-        
-        if (profileError) {
-          console.error('プロフィール作成エラー:', profileError)
-        }
-      } else {
-        console.log('プロフィールは既に存在します')
-      }
-    }
+    // プロフィール作成部分は削除（後でログイン時に作成）
+    console.log('認証ユーザー作成成功、プロフィールはログイン時に作成します');
     
     return data
   } catch (error) {
@@ -244,4 +231,3 @@ export const removeBadge = async (badgeName) => {
 export const onAuthStateChange = (callback) => {
   return supabase.auth.onAuthStateChange(callback)
 }
-  

@@ -1,0 +1,12 @@
+cat > .gitignore << 'EOF'
+node_modules/
+*.env
+*.log
+.DS_Store
+package-lock.json
+discord-bot-clean/.env
+discord-bot-clean/*.log
+discord-bot-clean/.DS_Store
+discord-bot-clean/package-lock.json
+discord-supabase-clean/
+EOF

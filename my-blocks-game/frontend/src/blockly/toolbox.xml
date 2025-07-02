@@ -1,0 +1,37 @@
+<xml>        <!-- 基本アクション -->
+        <category name="基本アクション" id="action" colour="#4C97FF" secondaryColour="#3373CC">
+            <block type="attack"></block>
+            <block type="wave_left_hand"></block>
+            <block type="wave_right_hand"></block>
+            <!-- <block type="heal"></block> -->
+            <block type="wait_seconds">
+                <value name="SECONDS">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="wait"></block>
+        </category>
+        
+        <!-- 回復魔法（ステージ2以降） -->
+        <category name="回復魔法" id="healing" colour="#008b8b" secondaryColour="#fffe0">
+            <block type="cast_healing"></block>
+            <!-- <block type="cast_healing_magic"></block> -->
+        </category>        <!-- 魔法詠唱（ステージ3以降） -->
+        <category name="魔法詠唱" id="magic" colour="#ffffe0" secondaryColour="#3373CC">
+            <block type="cast_magic"></block>
+            <!-- <block type="cast_fire_magic"></block> -->
+            <block type="cast_ice_magic"></block>
+        </category>
+          <!-- 薬学（ステージ6以降） -->
+        <category name="薬学" id="alchemy" colour="#41a65c" secondaryColour="#2d7341">
+            <block type="brew_antidote"></block>
+            <block type="use_potion"></block>
+        </category>
+          <!-- 制御（ステージ8以降） -->
+        <category name="制御" id="control" colour="#3c9966" secondaryColour="#2d7341">
+            <block type="repeat_twice"></block>
+            <block type="repeat_three_times"></block>
+        </category>
+</xml>

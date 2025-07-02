@@ -1,0 +1,17 @@
+{
+  "name": "discord-supabase-clean",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.2",
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.0.0"
+  }
+}
